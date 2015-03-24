@@ -64,7 +64,7 @@ gcc -Iboot/ -fno-builtin -Wall -ggdb -m32 -gstabs -nostdinc  -fno-stack-protecto
 
 |   参数      |                   含义                           |
 |------------|--------------------------------------------------|
-| -fno-builtin |    除非用 __builtin__ 前缀否则不进行 builtin 函数的优化；|
+| -fno-builtin |    除非用 \_\_builtin\_\_ 前缀否则不进行 builtin 函数的优化；|
 | -Wall        |    warning all  |
 | -ggdb        |    生成 gdb 使用的调试信息  |
 | -m32         |    生成适用于 32 bit 环境的代码 |
@@ -90,6 +90,7 @@ ld -m    elf_i386 -nostdlib -N -e start -Ttext 0x7C00 obj/boot/bootasm.o obj/boo
 关键参数：
 
 |    参数     |        含义        |
+|------------|--------------------|
 | -m elf_i386 | 模拟为 i386 上的连接器 |
 | -nostdlib   | 不使用标准库   |
 | -N          | 设置代码段和数据段均可读写 |
@@ -352,7 +353,7 @@ lab1_switch_to_user(void) {
 
 然后修改 trap.c 里的中断处理代码。
 
-```
+```c
 case T_SWITCH_TOU:
     if(tf -> tf_cs != USER_CS) {
         frame_k2u = * tf;
