@@ -11,7 +11,9 @@
 > 实现 first fit 连续内存分配算法，需要修改文件 default_pmm.c 。  
 > 注意在链表中需要按空闲块起始地址排序形成有序的链表。
 
-实现上参考了 result ，一个稍优的算法会在“改进空间”部分给出。主要修改 `default_pmm.c` 文件中的三个函数，分别是：初始化用的 `default_init_memap` ，分配页使用的 `default_alloc_pages` ，释放页用的 `default_free_pages` 。  
+实际上实现了两个版本，目前您在 git 上看到的是“改进空间”中所描述的版本。您可以通过查询 git commit 的纪录获得下问所说的“第一个版本”的代码。
+
+第一个版本实现上参考了 result 。主要修改 `default_pmm.c` 文件中的三个函数，分别是：初始化用的 `default_init_memap` ，分配页使用的 `default_alloc_pages` ，释放页用的 `default_free_pages` 。  
 
 初始化函数的修改比较简单，只需要将当前的以 `base` 作为基址长度为 `n` 的页按顺序加入链表，并设定好 Page 的 `property` 值就可以了，除了 base 之外其他页的 property 都为 0 。其他部分不用修改，和初始代码完全相同。  
 
