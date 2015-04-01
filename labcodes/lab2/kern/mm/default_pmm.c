@@ -88,43 +88,40 @@ default_init_memmap(struct Page *base, size_t n) {
 static struct Page *
 default_alloc_pages(size_t n) {
     assert(n > 0);
-    // too large to allocate
+
+    // too large 
     if (n > nr_free) {
         return NULL;
     }
 
-    struct Page *page = NULL;
-    list_entry_t *le = & free_list;
+    list_entry_t * le = & free_list;
 
-    while ((le = list_next(le)) != &free_list) {
-        // convert entry list to page
+    while((le = list_next(le)) != & free_list) {
         struct Page *p = le2page(le, page_link);
-        // if the number of free blocks in this 
-        // page exceeds n
-        if(p -> property >= n) {
+
+        if(p -> property >= n){
             int i;
-            for(i = 0; i < n; i ++) {
-                // convert to page
-                struct Page * _p = le2page(le, page_link);
-                // page reserved
+
+            // set the following n pages to reserved
+            for(i = 0; i < n; i ++){
+                struct Page *_p = le2page(le, page_link);
                 SetPageReserved(_p);
-                // clear property
                 ClearPageProperty(_p);
-                // remove from free list
+
+                list_entry_t * len = list_next(le);
                 list_del(le);
-                // got to process next entry
-                le = list_next(le);
+                le = len;
             }
 
-            if(p -> property > n) 
+            // if have free space
+            if(p -> property > n){
                 (le2page(le, page_link)) -> property = p -> property - n;
+            }
 
             nr_free -= n;
             return p;
         }
     }
-
-    // no suitable memory block, return null
     return NULL;
 }
 
@@ -137,7 +134,8 @@ default_free_pages(struct Page *base, size_t n) {
     // get the list entry of the first addr larger than base
     while((le = list_next(le)) != & free_list) {
         p = le2page(le, page_link);
-        if(p > base) {
+        // p > base also works
+        if(p >= base + n) {
             break;
         }
     }
@@ -149,7 +147,7 @@ default_free_pages(struct Page *base, size_t n) {
 
     base -> flags = 0;
     set_page_ref(base, 0);
-    ClearPageProperty(base);
+    // ClearPageProperty(base);
     SetPageProperty(base);
     base -> property = n;
 
