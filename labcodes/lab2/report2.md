@@ -11,7 +11,7 @@
 > 实现 first fit 连续内存分配算法，需要修改文件 default_pmm.c 。  
 > 注意在链表中需要按空闲块起始地址排序形成有序的链表。
 
-主要修改 `default_pmm.c` 文件中的三个函数，分别是：初始化用的 `default_init_memap` ，分配页使用的 `default_alloc_pages` ，释放页用的 `default_free_pages` 。  
+实现上参考了 result ，一个稍优的算法会在“改进空间”部分给出。主要修改 `default_pmm.c` 文件中的三个函数，分别是：初始化用的 `default_init_memap` ，分配页使用的 `default_alloc_pages` ，释放页用的 `default_free_pages` 。  
 
 初始化函数的修改比较简单，只需要将当前的以 `base` 作为基址长度为 `n` 的页按顺序加入链表，并设定好 Page 的 `property` 值就可以了，除了 base 之外其他页的 property 都为 0 。其他部分不用修改，和初始代码完全相同。  
 
@@ -41,11 +41,28 @@ return & ((pte_t *) KADDR(PDE_ADDR(* pdep)))[PTX(la)]
 
 > PDE 和 PTE 的每个组成部分的含义和对 ucore 的用途。
 
-// TODO
+PTE 每个部分的组成如下：
+
+```
+/* page table/directory entry flags */
+#define PTE_P           0x001                   // Present
+#define PTE_W           0x002                   // Writeable
+#define PTE_U           0x004                   // User
+#define PTE_PWT         0x008                   // Write-Through
+#define PTE_PCD         0x010                   // Cache-Disable
+#define PTE_A           0x020                   // Accessed
+#define PTE_D           0x040                   // Dirty
+#define PTE_PS          0x080                   // Page Size
+#define PTE_MBZ         0x180                   // Bits must be zero
+#define PTE_AVAIL       0xE00                   // Available for software use
+                                                // The PTE_AVAIL bits aren't used by the kernel or interpreted by the
+                                                // hardware, so user processes are allowed to set them arbitrarily.
+
+```
 
 > ucore 执行过程中访问内存，出现了页访问异常，请问硬件要做哪些事情？
 
-Page Fault 首先会发出一个异常。硬件处理的方式是使用替换算法替换掉较旧的一个页面，然后在主存中载入要访问的页面。
+Page Fault 首先会发出一个异常，操作系统通过 IDT 得出这是一个缺页异常，跳转到异常处理代码。硬件处理的方式是使用替换算法替换掉较旧的一个页面，然后在主存中载入要访问的页面。
 
 ## Exercise 03
 
@@ -55,8 +72,8 @@ Page Fault 首先会发出一个异常。硬件处理的方式是使用替换算
 
 > 数据结构 Page 的全局变量（数组）的每一项与页表的页表项与页目录项有无对应关系？若有，其对应关系是什么？
 
-// TODO
+pages 数组里的就是页目录表和页表指向的物理页。
 
 > 若希望虚拟地址与物理地址相等，则需要如何修改 lab2 ？
 
-// TODO
+将 ucore 的起始地址和内核虚地址设为相同的值。
