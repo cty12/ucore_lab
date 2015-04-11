@@ -14,7 +14,7 @@
 
 > 请描述页目录项 (PDE) 和页表项 (PTE) 中组成部分对 ucore 实现页替换算法的潜在用处。
 
-在 PDE 和 PTE flags 中有 PTE_\A （访问位）和 PTE\_D （修改位，或者叫脏位），两者在下文所述的 extended clock 算法中有用到。
+在 PDE 和 PTE flags 中有 PTE\_A （访问位）和 PTE\_D （修改位，或者叫脏位），两者在下文所述的 extended clock 算法中有用到。
 
 > 如果 ucore 的缺页服务例程在执行过程中访问内存出现了页访问异常，请问硬件要做哪些事情？
 
