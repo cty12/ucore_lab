@@ -18,14 +18,14 @@ context 储存的是进程的上下文，即各个寄存器的值：
 
 ```
 struct context {
-    uint32\_t eip;
-    uint32\_t esp;
-    uint32\_t ebx;
-    uint32\_t ecx;
-    uint32\_t edx;
-    uint32\_t esi;
-    uint32\_t edi;
-    uint32\_t ebp;
+    uint32_t eip;
+    uint32_t esp;
+    uint32_t ebx;
+    uint32_t ecx;
+    uint32_t edx;
+    uint32_t esi;
+    uint32_t edi;
+    uint32_t ebp;
 };
 ```
 
@@ -60,7 +60,7 @@ struct trapframe {
 
 ### 实验步骤
 
-填写 do_\fork() 函数。首先使用 alloc\_proc() 分配并初始化一个新进程，并将其 parrent 设为当前进程。然后为进程分配栈，然后复制原有进程的执行状态。然后将 PCB 加入 hash 表和 proc\_list ，最后将新进程设置为 runable 。
+填写 do\_fork() 函数。首先使用 alloc\_proc() 分配并初始化一个新进程，并将其 parrent 设为当前进程。然后为进程分配栈，然后复制原有进程的执行状态。然后将 PCB 加入 hash 表和 proc\_list ，最后将新进程设置为 runable 。
 
 实验中需要注意使用 local\_intr\_save 和 local\_intr\_restore 打开和关闭中断，具体方法可以参考代码中的 proc_run() 函数。
 
