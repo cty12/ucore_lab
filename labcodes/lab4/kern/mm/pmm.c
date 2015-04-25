@@ -363,7 +363,7 @@ pmm_init(void) {
 // return vaule: the kernel virtual address of this pte
 pte_t *
 get_pte(pde_t *pgdir, uintptr_t la, bool create) {
-    /* LAB2 EXERCISE 2: YOUR CODE
+    /* LAB2 EXERCISE 2: 2012011348
      *
      * If you need to visit a physical address, please use KADDR()
      * please read pmm.h for useful macros
@@ -396,6 +396,30 @@ get_pte(pde_t *pgdir, uintptr_t la, bool create) {
     }
     return NULL;          // (8) return page table entry
 #endif
+
+    // find page directory entry
+    pde_t * pdep = & pgdir[PDX(la)];
+    // if page dir entry does not exist
+    if((* pdep & PTE_P) == 0) {
+        // if creation is needed
+        if(create) {
+            struct Page * page = alloc_page();
+            // just in case
+            if(page == NULL)
+                return NULL;
+            // set reference
+            set_page_ref(page, 1);
+            // clear page content
+            uintptr_t pa = page2pa(page);
+            memset(KADDR(pa), 0, PGSIZE);
+            * pdep = pa | PTE_U | PTE_W | PTE_P;
+        } else {
+            return NULL;
+        }
+    } 
+
+    // return 
+    return & ((pte_t *) KADDR(PDE_ADDR(* pdep)))[PTX(la)];
 }
 
 //get_page - get related Page struct for linear address la using PDT pgdir
@@ -416,7 +440,7 @@ get_page(pde_t *pgdir, uintptr_t la, pte_t **ptep_store) {
 //note: PT is changed, so the TLB need to be invalidate 
 static inline void
 page_remove_pte(pde_t *pgdir, uintptr_t la, pte_t *ptep) {
-    /* LAB2 EXERCISE 3: YOUR CODE
+    /* LAB2 EXERCISE 3: 2012011348
      *
      * Please check if ptep is valid, and tlb must be manually updated if mapping is updated
      *
@@ -441,6 +465,18 @@ page_remove_pte(pde_t *pgdir, uintptr_t la, pte_t *ptep) {
                                   //(6) flush tlb
     }
 #endif
+    // check if pte is present
+    if((* ptep) & PTE_P) {
+        struct Page * page = pte2page(* ptep);
+        // decrease page reference 
+        // free page when reference reaches 0
+        if(page_ref_dec(page) == 0) {
+            free_page(page);
+        }
+        * ptep = 0;
+        // !! flush TLB !!
+        tlb_invalidate(pgdir, la);
+    }
 }
 
 //page_remove - free an Page which is related linear address la and has an validated pte
