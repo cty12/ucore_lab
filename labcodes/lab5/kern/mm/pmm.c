@@ -363,7 +363,7 @@ pmm_init(void) {
 // return vaule: the kernel virtual address of this pte
 pte_t *
 get_pte(pde_t *pgdir, uintptr_t la, bool create) {
-    /* LAB2 EXERCISE 2: YOUR CODE
+    /* LAB2 EXERCISE 2: 2012011348
      *
      * If you need to visit a physical address, please use KADDR()
      * please read pmm.h for useful macros
@@ -396,6 +396,30 @@ get_pte(pde_t *pgdir, uintptr_t la, bool create) {
     }
     return NULL;          // (8) return page table entry
 #endif
+
+    // find page directory entry
+    pde_t * pdep = & pgdir[PDX(la)];
+    // if page dir entry does not exist
+    if((* pdep & PTE_P) == 0) {
+        // if creation is needed
+        if(create) {
+            struct Page * page = alloc_page();
+            // just in case
+            if(page == NULL)
+                return NULL;
+            // set reference
+            set_page_ref(page, 1);
+            // clear page content
+            uintptr_t pa = page2pa(page);
+            memset(KADDR(pa), 0, PGSIZE);
+            * pdep = pa | PTE_U | PTE_W | PTE_P;
+        } else {
+            return NULL;
+        }
+    } 
+
+    // return 
+    return & ((pte_t *) KADDR(PDE_ADDR(* pdep)))[PTX(la)];
 }
 
 //get_page - get related Page struct for linear address la using PDT pgdir
@@ -416,7 +440,7 @@ get_page(pde_t *pgdir, uintptr_t la, pte_t **ptep_store) {
 //note: PT is changed, so the TLB need to be invalidate 
 static inline void
 page_remove_pte(pde_t *pgdir, uintptr_t la, pte_t *ptep) {
-    /* LAB2 EXERCISE 3: YOUR CODE
+    /* LAB2 EXERCISE 3: 2012011348
      *
      * Please check if ptep is valid, and tlb must be manually updated if mapping is updated
      *
@@ -441,6 +465,18 @@ page_remove_pte(pde_t *pgdir, uintptr_t la, pte_t *ptep) {
                                   //(6) flush tlb
     }
 #endif
+    // check if pte is present
+    if((* ptep) & PTE_P) {
+        struct Page * page = pte2page(* ptep);
+        // decrease page reference 
+        // free page when reference reaches 0
+        if(page_ref_dec(page) == 0) {
+            free_page(page);
+        }
+        * ptep = 0;
+        // !! flush TLB !!
+        tlb_invalidate(pgdir, la);
+    }
 }
 
 void
@@ -508,7 +544,7 @@ copy_range(pde_t *to, pde_t *from, uintptr_t start, uintptr_t end, bool share) {
         assert(page!=NULL);
         assert(npage!=NULL);
         int ret=0;
-        /* LAB5:EXERCISE2 YOUR CODE
+        /* LAB5:EXERCISE2 2012011348
          * replicate content of page to npage, build the map of phy addr of nage with the linear addr start
          *
          * Some Useful MACROs and DEFINEs, you can use them in below implementation.
@@ -522,6 +558,15 @@ copy_range(pde_t *to, pde_t *from, uintptr_t start, uintptr_t end, bool share) {
          * (3) memory copy from src_kvaddr to dst_kvaddr, size is PGSIZE
          * (4) build the map of phy addr of  nage with the linear addr start
          */
+
+        // 1
+        void * src_kvaddr = page2kva(page);
+        // 2
+        void * dst_kvaddr = page2kva(npage);
+        // 3
+        memcpy(dst_kvaddr, src_kvaddr, PGSIZE);
+        // 4
+        ret = page_insert(to, npage, start, perm);
         assert(ret == 0);
         }
         start += PGSIZE;
