@@ -44,6 +44,8 @@ static struct run_queue __rq;
 
 void
 sched_init(void) {
+    // debug info 
+    cprintf("schedule init. \n");
     list_init(&timer_list);
 
     sched_class = &default_sched_class;
@@ -91,6 +93,9 @@ schedule(void) {
         if (next == NULL) {
             next = idleproc;
         }
+        // debug info
+        cprintf("current process pid %d; next process pid %d \n", 
+            current -> pid, next -> pid);
         next->runs ++;
         if (next != current) {
             proc_run(next);

@@ -36,6 +36,8 @@ proc_stride_comp_f(void *a, void *b)
  */
 static void
 stride_init(struct run_queue *rq) {
+     // debug info
+     cprintf("stride init. \n");
      /* LAB6: YOUR CODE */
      list_init(&(rq->run_list));
      rq->lab6_run_pool = NULL;
@@ -57,7 +59,9 @@ stride_init(struct run_queue *rq) {
  */
 static void
 stride_enqueue(struct run_queue *rq, struct proc_struct *proc) {
-     /* LAB6: YOUR CODE */
+     // debug info
+	cprintf("process pid %d enqueue. \n", proc -> pid);
+	/* LAB6: YOUR CODE */
 #if USE_SKEW_HEAP
      rq->lab6_run_pool =
           skew_heap_insert(rq->lab6_run_pool, &(proc->lab6_run_pool), proc_stride_comp_f);
@@ -82,6 +86,8 @@ stride_enqueue(struct run_queue *rq, struct proc_struct *proc) {
  */
 static void
 stride_dequeue(struct run_queue *rq, struct proc_struct *proc) {
+	// debug info
+	cprintf("process pid %d dequeue. \n", proc -> pid);
      /* LAB6: YOUR CODE */
 #if USE_SKEW_HEAP
      rq->lab6_run_pool =
