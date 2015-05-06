@@ -45,7 +45,7 @@ static struct run_queue __rq;
 void
 sched_init(void) {
     // debug info 
-    cprintf("schedule init. \n");
+    // cprintf("schedule init. \n");
     list_init(&timer_list);
 
     sched_class = &default_sched_class;
@@ -54,7 +54,7 @@ sched_init(void) {
     rq->max_time_slice = MAX_TIME_SLICE;
     sched_class->init(rq);
 
-    cprintf("sched class: %s\n", sched_class->name);
+    // cprintf("sched class: %s\n", sched_class->name);
 }
 
 void
@@ -94,7 +94,7 @@ schedule(void) {
             next = idleproc;
         }
         // debug info
-        cprintf("current process pid %d; next process pid %d \n", 
+        // cprintf("current process pid %d; next process pid %d \n", 
             current -> pid, next -> pid);
         next->runs ++;
         if (next != current) {
