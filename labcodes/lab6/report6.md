@@ -1,4 +1,4 @@
-# Lab 5 Report
+# Lab 6 Report
 
 计 24 陈天昱 2012011348
 
@@ -29,7 +29,7 @@ RR\_init() 用于初始化 run\_queue ；RR\_enqueue() 用于向 run_queue 中�
 5. 若一个进程用完了时间片，它的优先级降低。将其插入低一级的队列的队尾；
 6. 在最低级，进程按照 RR 算法调度，直至退出离开队列。
 
-（参考资料：![Multilevel feedback queue](http://en.wikipedia.org/wiki/Multilevel_feedback_queue)）
+（参考资料：[Multilevel feedback queue](http://en.wikipedia.org/wiki/Multilevel_feedback_queue)）
 
 ## Exercise 2
 
