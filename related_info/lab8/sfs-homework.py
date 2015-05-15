@@ -244,11 +244,29 @@ class fs:
             print 'unlink("%s");' % tfile
 
         inum = self.nameToInum[tfile]
+		pinum = self.nameToInum[self.getParent(tfile)]
 
-    # YOUR CODE, YOUR ID
-        # IF inode.refcnt ==1, THEN free data blocks first, then free inode, ELSE dec indoe.refcnt
+    # @author cty 2012011348
+        # IF inode.refcnt ==1, THEN free data blocks first, then free inode, ELSE dec inode.refcnt
         # remove from parent directory: delete from parent inum, delete from parent addr
     # DONE
+ 
+		# find inode
+		inode = self.inodes[inum]
+		# IF inode.refcnt ==1
+        if inode.getRefCnt() == 1:
+            # THEN free data blocks first
+            self.dataFree(inode.getAddr())
+            # THEN free inode
+            self.inodeFree(inum)
+		# ELSE
+        else:
+            inode.decRefCnt()
+ 
+        # remove from parent directory
+		pinode = self.inodes[pinum]
+        pinode.decRefCnt()
+        self.data[pinode.getAddr()].delDirEntry(tfile)
 
         # finally, remove from files list
         self.files.remove(tfile)
