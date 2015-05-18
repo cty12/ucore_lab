@@ -155,6 +155,7 @@ file_testfd(int fd, bool readable, bool writable) {
 // open file
 int
 file_open(char *path, uint32_t open_flags) {
+    // cprintf("hey! opening file %s. \n", path);
     bool readable = 0, writable = 0;
     switch (open_flags & O_ACCMODE) {
     case O_RDONLY: readable = 1; break;
@@ -211,6 +212,7 @@ file_close(int fd) {
 // read file
 int
 file_read(int fd, void *base, size_t len, size_t *copied_store) {
+    cprintf("file_read. fd %d. \n");
     int ret;
     struct file *file;
     *copied_store = 0;
@@ -220,6 +222,7 @@ file_read(int fd, void *base, size_t len, size_t *copied_store) {
     if (!file->readable) {
         return -E_INVAL;
     }
+    // cprintf("fd array acquire. \n");
     fd_array_acquire(file);
 
     struct iobuf __iob, *iob = iobuf_init(&__iob, base, len, file->pos);
@@ -230,6 +233,7 @@ file_read(int fd, void *base, size_t len, size_t *copied_store) {
         file->pos += copied;
     }
     *copied_store = copied;
+    // cprintf("fd array acquire. \n");
     fd_array_release(file);
     return ret;
 }

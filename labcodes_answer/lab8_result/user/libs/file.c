@@ -18,6 +18,7 @@ close(int fd) {
 
 int
 read(int fd, void *base, size_t len) {
+    cprintf("user read. \n");
     return sys_read(fd, base, len);
 }
 

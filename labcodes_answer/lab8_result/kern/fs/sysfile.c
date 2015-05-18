@@ -59,6 +59,7 @@ sysfile_close(int fd) {
 /* sysfile_read - read file */
 int
 sysfile_read(int fd, void *base, size_t len) {
+    cprintf("sysfile_read. \n");
     struct mm_struct *mm = current->mm;
     if (len == 0) {
         return 0;
@@ -77,6 +78,8 @@ sysfile_read(int fd, void *base, size_t len) {
         if ((alen = IOBUF_SIZE) > len) {
             alen = len;
         }
+        // calling file_read here
+        // cprintf("calling file read. \n");
         ret = file_read(fd, buffer, alen, &alen);
         if (alen != 0) {
             lock_mm(mm);

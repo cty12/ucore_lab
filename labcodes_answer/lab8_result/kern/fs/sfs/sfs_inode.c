@@ -551,6 +551,8 @@ sfs_close(struct inode *node) {
  */
 static int
 sfs_io_nolock(struct sfs_fs *sfs, struct sfs_inode *sin, void *buf, off_t offset, size_t *alenp, bool write) {
+    cprintf("reading file sectors. \n");
+
     struct sfs_disk_inode *din = sin->din;
     assert(din->type != SFS_TYPE_DIR);
     off_t endpos = offset + *alenp, blkoff;
@@ -667,6 +669,7 @@ sfs_io(struct inode *node, struct iobuf *iob, bool write) {
 // sfs_read - read file
 static int
 sfs_read(struct inode *node, struct iobuf *iob) {
+    cprintf("sfs_read. \n");
     return sfs_io(node, iob, 0);
 }
 
